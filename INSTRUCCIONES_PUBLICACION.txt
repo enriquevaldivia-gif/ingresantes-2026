@@ -1,0 +1,12 @@
+INGRESANTES 2026 — V6
+
+1. Esta versión agrega ventana de ingresantes por universidad y conserva los logos y el escudo.
+2. El sitio NO contiene nombres reales dentro del código estático. Los recibe desde Apps Script al conectarlo.
+3. En https://script.google.com crea un proyecto, pega Code.gs y despliega como aplicación web. Ejecutar como: tú. Acceso: cualquier persona (el endpoint será público).
+4. Copia la URL de implementación que termina en /exec. Abre config.js y reemplaza API_URL: "" por esa URL.
+5. Sube los archivos web actualizados al repositorio, manteniendo index.html en la raíz. No subas Code.gs al repositorio público; guárdalo solo en Apps Script.
+6. Comprueba que el estado diga "Datos institucionales conectados" y que al pulsar una universidad aparezcan las fichas.
+7. PUBLICAR_TODOS_AUTORIZADOS está activado porque el responsable confirmó autorización general. Antes de desplegar, verifica que la autorización cubra todos los nombres y datos publicados. Para control individual, cambia a false y marca SI en V2_PUBLICACION!H. Un NO explícito impide publicar incluso en modo general.
+8. Sede no está en los campos verificados; se deja vacía para no inventarla. Fotos se toman de V2_PUBLICACION!G cuando estén disponibles.
+9. La web pública no puede proteger nombres con una contraseña de GitHub Pages: todo dato devuelto por el endpoint es público.
+10. Los números de demostración siguen visibles hasta que se conecte el endpoint; no difundir como datos actualizados sin verificar.
