@@ -85,8 +85,11 @@ function abrirUniversidad(nombre) {
     });
   }
 
-  document.getElementById('universities').after(panel);
-  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const tarjeta = [...document.querySelectorAll('.university-card')]
+  .find(el => el.querySelector('.uni-name')?.textContent.trim() === nombre);
+
+(tarjeta || document.getElementById('universities')).after(panel);
+  
 }
 
 document.getElementById('universities')
