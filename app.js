@@ -23,3 +23,77 @@ function applyPayload(p){if(!p||p.ok!==true||!Array.isArray(p.universityRows)||!
 // JSONP evita las restricciones CORS de Apps Script ContentService. Solo se transportan agregados públicos.
 function loadData(){const url=(window.INGRESANTES_CONFIG||{}).API_URL;if(!url)return;const callback='ingresantesCallback_'+Date.now();const script=document.createElement('script');let finished=false;const cleanup=()=>{delete window[callback];script.remove()};window[callback]=p=>{finished=true;try{applyPayload(p)}catch(e){$('status').textContent='No se pudo validar la respuesta; se muestra la vista de referencia'}cleanup()};script.onerror=()=>{if(!finished){$('status').textContent='Conexión no disponible; se muestra la vista de referencia';cleanup()}};script.src=url+(url.includes('?')?'&':'?')+'callback='+encodeURIComponent(callback)+'&t='+Date.now();document.head.appendChild(script)}
 $('universitySearch').addEventListener('input',renderUniversities);$('menu').addEventListener('click',()=>{const open=$('nav').classList.toggle('open');$('menu').setAttribute('aria-expanded',String(open))});document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click',()=>$('nav').classList.remove('open')));render();loadData();if((window.INGRESANTES_CONFIG||{}).API_URL)setInterval(loadData,Math.max(1,Number(window.INGRESANTES_CONFIG.REFRESH_MINUTES)||5)*60000);
+
+// VISTA DE INGRESANTES POR UNIVERSIDAD — V5
+function abrirUniversidad(nombre) {
+  const universidad = rows(data.universityRows)
+    .find(([n]) => n === nombre);
+
+  if (!universidad) return;
+
+  const registros = Array.isArray(data.publicStudents)
+    ? data.publicStudents.filter(a =>
+        String(a.universidad || '').toLocaleUpperCase('es') ===
+        nombre.toLocaleUpperCase('es')
+      )
+    : [];
+
+  const existente = document.getElementById('detalleUniversidad');
+  if (existente) existente.remove();
+
+  const panel = document.createElement('section');
+  panel.id = 'detalleUniversidad';
+  panel.style.cssText =
+    'max-width:1100px;margin:30px auto;padding:25px;' +
+    'background:#f4f7fb;border-radius:16px;color:#102b50';
+
+  const titulo = document.createElement('h2');
+  titulo.textContent = nombre;
+  panel.appendChild(titulo);
+
+  const total = document.createElement('p');
+  total.textContent = `${universidad[1]} admisiones registradas`;
+  panel.appendChild(total);
+
+  if (registros.length === 0) {
+    const aviso = document.createElement('p');
+    aviso.textContent =
+      'Las fichas de estudiantes autorizados estarán disponibles próximamente.';
+    panel.appendChild(aviso);
+  } else {
+    registros.forEach(a => {
+      const ficha = document.createElement('article');
+      ficha.style.cssText =
+        'background:white;padding:18px;margin:12px 0;' +
+        'border-radius:12px;border:1px solid #dce4ed';
+
+      const datos = [
+        a.nombre,
+        `Grado: ${a.grado || 'No indicado'}`,
+        `Sección: ${a.seccion || 'No indicada'}`,
+        `Sede: ${a.sede || 'No indicada'}`,
+        `Carrera: ${a.carrera || 'No indicada'}`
+      ];
+
+      datos.forEach(valor => {
+        const linea = document.createElement('p');
+        linea.textContent = valor || '';
+        ficha.appendChild(linea);
+      });
+
+      panel.appendChild(ficha);
+    });
+  }
+
+  document.getElementById('universities').after(panel);
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.getElementById('universities')
+  .addEventListener('click', evento => {
+    const tarjeta = evento.target.closest('.university-card');
+    if (!tarjeta) return;
+
+    const nombre = tarjeta.querySelector('.uni-name')?.textContent;
+    if (nombre) abrirUniversidad(nombre);
+  });
